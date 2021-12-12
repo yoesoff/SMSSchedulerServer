@@ -12,6 +12,8 @@ module.exports = {
         type: Sequelize.DATE
       },
       message: {
+        allowNull: false,
+        defaultValue: "empty",
         type: Sequelize.STRING
       },
       createdAt: {
