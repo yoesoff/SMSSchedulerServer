@@ -1,11 +1,6 @@
-var express = require('express');
-const {user: userController} = require("../controllers");
-var router = express.Router();
-
-/* GET users listing. */
-// router.get('/', function(req, res, next) {
-//   res.send('respond with a resource');
-// });
+const express = require('express');
+const router = express.Router();
+const userController = require('../controllers').user;
 
 /* User Router */
 router.get('/', userController.list);
