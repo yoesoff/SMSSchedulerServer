@@ -1,4 +1,4 @@
-const {User} = require("../models");
+const {Op} = require("sequelize");
 const ScheduleUser = require('../models').ScheduleUser;
 const Schedule = require('../models').Schedule;
 
@@ -6,7 +6,7 @@ module.exports = {
     list(req, res) {
         let limit = parseInt(req.query.limit || 5);
         let offset = (parseInt(req.query.page || 1) - 1) * limit;
-        return User
+        return Schedule
             .findAndCountAll({
                 limit: limit,
                 offset: offset,
@@ -44,13 +44,20 @@ module.exports = {
     },
 
     add(req, res) {
-        return Schedule
-            .create({
-                run_at: req.body.run_at,
-                message: req.body.message,
-            })
-            .then((schedule) => res.status(201).send(schedule))
-            .catch((error) => res.status(400).send(error));
+        if ((new Date(req.body.run_at)) != "Invalid Date") {
+            return Schedule
+                .create({
+                    run_at: req.body.run_at,
+                    message: req.body.message,
+                })
+                .then((schedule) => {
+                    console.log(`Prepare for ${req.body.run_at}.`);
+                    res.status(201).send(schedule)
+                })
+                .catch((error) => res.status(400).send(error));
+        } else {
+            res.status(400).send();
+        }
     },
 
     update(req, res) {
@@ -89,4 +96,31 @@ module.exports = {
             })
             .catch((error) => res.status(400).send(error));
     },
+
+    cron() {
+        Schedule
+            .findAndCountAll({
+                where: {
+                    run_at: {
+                        [Op.lte]: new Date()
+                    }
+                },
+                include: [
+                    {
+                        model: ScheduleUser
+                    },
+                ],
+                order: [
+                    ['createdAt', 'ASC'],
+                ],
+            })
+            .then((schedules) => {
+                schedules.rows.forEach(schedule => {
+                    console.log("schedule", schedule.ScheduleUsers);
+                });
+            })
+            .catch((error) => {
+
+            });
+    }
 };

@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const schedule = require('node-schedule');
 
 var app = express();
 
@@ -20,6 +21,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var schedulesRouter = require('./routes/schedules');
 var schedulesusersRouter = require('./routes/scheduleusers');
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/schedules', schedulesRouter);
@@ -39,6 +41,12 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+const scheduleController = require('./controllers').schedule;
+const job = schedule.scheduleJob('* * * * *', function(){
+  console.log(`Cron running at ${(new Date())} `);
+  scheduleController.cron();
 });
 
 module.exports = app;
