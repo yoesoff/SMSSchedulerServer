@@ -6,12 +6,18 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       User.hasMany(models.ScheduleUser, {
-        foreignKey: 'user_id',
-        as: 'scheduleUsers'
+        foreignKey: 'user_id'
       });
     }
   };
+
   User.init({
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      unique: true,
+      primaryKey: true,
+    },
     name: DataTypes.STRING,
     email: DataTypes.STRING,
     phone: DataTypes.STRING,

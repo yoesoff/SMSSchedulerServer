@@ -3,9 +3,17 @@ const User = require('../models').User;
 
 module.exports = {
     list(req, res) {
+        let limit = parseInt(req.query.limit || 5);
+        let offset = parseInt(req.query.page||0) * limit;
         return User
-            .findAll({
-                include: [],
+            .findAndCountAll({
+                limit: limit,
+                offset: offset,
+                include: [
+                    {
+                        model: ScheduleUser
+                    },
+                ],
                 order: [
                     ['createdAt', 'DESC'],
                 ],

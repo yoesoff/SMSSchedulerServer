@@ -11,12 +11,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Schedule.hasMany(models.ScheduleUser, {
-        foreignKey: 'schedule_id',
-        as: 'scheduleUsers'
+        foreignKey: 'user_id'
       });
     }
   };
+
   Schedule.init({
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      unique: true,
+      primaryKey: true,
+    },
     run_at: DataTypes.DATE,
     message: DataTypes.STRING
   }, {

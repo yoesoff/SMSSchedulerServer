@@ -1,11 +1,20 @@
+const {User} = require("../models");
 const ScheduleUser = require('../models').ScheduleUser;
 const Schedule = require('../models').Schedule;
 
 module.exports = {
     list(req, res) {
-        return Schedule
-            .findAll({
-                include: [],
+        let limit = parseInt(req.query.limit || 5);
+        let offset = parseInt(req.query.page || 0) * limit;
+        return User
+            .findAndCountAll({
+                limit: limit,
+                offset: offset,
+                include: [
+                    {
+                        model: ScheduleUser
+                    },
+                ],
                 order: [
                     ['createdAt', 'DESC'],
                 ],
