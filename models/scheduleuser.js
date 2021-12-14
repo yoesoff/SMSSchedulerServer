@@ -17,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
 
   ScheduleUser.init({
     id: {
+      id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        unique: true,
+        primaryKey: true,
+      },
       type: DataTypes.INTEGER,
       allowNull: false,
       unique: true,

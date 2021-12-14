@@ -5,8 +5,8 @@ const scheduleController = require('../controllers').schedule;
 /* Schedule Router */
 router.get('/', scheduleController.list);
 router.get('/:id', scheduleController.getById);
-router.post('/user', scheduleController.add);
-router.put('/user/:id', scheduleController.update);
-router.delete('/user/:id', scheduleController.delete);
+router.post('/', scheduleController.add);
+router.put('/:id', scheduleController.update);
+router.delete('/:id', scheduleController.delete);
 
 module.exports = router;

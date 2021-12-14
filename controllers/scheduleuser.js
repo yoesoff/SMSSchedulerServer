@@ -23,7 +23,13 @@ module.exports = {
 
     getById(req, res) {
         return ScheduleUser
-            .findByPk(req.params.id)
+            .findByPk(req.params.id, {
+                include: [{
+                    model: Schedule
+                },{
+                    model: User
+                }],
+            })
             .then((schedule) => {
                 if (!schedule) {
                     return res.status(404).send({

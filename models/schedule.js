@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
   Schedule.init({
     id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       unique: true,
       primaryKey: true,
     },

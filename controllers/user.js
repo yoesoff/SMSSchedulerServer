@@ -29,7 +29,6 @@ module.exports = {
             .findByPk(req.params.id, {
                 include: [{
                     model: ScheduleUser,
-                    as: 'scheduleuser'
                 }],
             })
             .then((user) => {
