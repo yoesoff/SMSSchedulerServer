@@ -4,7 +4,7 @@ const User = require('../models').User;
 module.exports = {
     list(req, res) {
         let limit = parseInt(req.query.limit || 5);
-        let offset = parseInt(req.query.page||0) * limit;
+        let offset = (parseInt(req.query.page || 1) - 1) * limit;
         return User
             .findAndCountAll({
                 limit: limit,
