@@ -1,6 +1,6 @@
 const {Op} = require("sequelize");
-const {ScheduleUser, User} = require('../models');
-const Schedule = require('../models').Schedule;
+const {ScheduleUser, Schedule, User} = require('../models');
+const axios = require('axios');
 
 module.exports = {
     list(req, res) {
@@ -108,21 +108,54 @@ module.exports = {
                     },
                     {
                         model: Schedule,
-                        required: false
+                        required: true,
+                        where: {
+                            run_at: {
+                                [Op.lte]: new Date()
+                            }
+                        }
                     }
                 ],
                 order: [
                     ['createdAt', 'DESC'],
                 ],
-                where:{
-                    status:"waiting"
+                where: {
+                    status: "waiting",
                 },
             })
             .then((scheduleusers) => {
-                console.log(scheduleusers);
+                let data = [];
+                scheduleusers.rows.forEach((su) => {
+
+                    if (typeof data[su.schedule_id] != 'undefined') {
+                        data[su.schedule_id] = {
+                            phone: `${data[su.schedule_id].phone},${su.User.phone}`,
+                            message: su.Schedule.message
+                        }
+                    } else {
+                        data[su.schedule_id] = {
+                            phone: su.User.phone,
+                            message: su.Schedule.message
+                        }
+                    }
+                });
+
+                data.forEach(async (d) => {
+                    const json = {
+                        "dnis": d.phone,
+                        "message": d.message
+                    };
+                    await axios.post('http://kr8tif.lawaapp.com:1338/api', json).then(function (response) {
+                        console.log("Axios response", response.data);
+                    }).catch(function (error) {
+                        console.log(error);
+                    }).then(function () {
+                    });
+                    console.log(json);
+                });
             })
             .catch((error) => {
-               console.log(error);
+                console.log(error);
             });
     }
 };
