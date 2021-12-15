@@ -126,14 +126,15 @@ module.exports = {
             .then((scheduleusers) => {
                 let data = [];
                 scheduleusers.rows.forEach((su) => {
-
                     if (typeof data[su.schedule_id] != 'undefined') {
                         data[su.schedule_id] = {
+                            ids: data[su.schedule_id].ids.concat([su.id]),
                             phone: `${data[su.schedule_id].phone},${su.User.phone}`,
                             message: su.Schedule.message
                         }
                     } else {
                         data[su.schedule_id] = {
+                            ids: [su.id],
                             phone: su.User.phone,
                             message: su.Schedule.message
                         }
@@ -147,15 +148,29 @@ module.exports = {
                     };
                     await axios.post('http://kr8tif.lawaapp.com:1338/api', json).then(function (response) {
                         console.log("Axios response", response.data);
-                    }).catch(function (error) {
-                        console.log(error);
-                    }).then(function () {
+
+                        // Update status waiting to pending
+                        ScheduleUser.update(
+                            {status: "pending"},
+                            {
+                                where: {
+                                    id: {
+                                        [Op.in]: d.ids
+                                    }
+                                }
+                            }
+                        )
+
+                    }).
+                        catch(function (error) {
+                            console.log(error);
+                        }).then(function () {
+                        });
+                        console.log(json);
                     });
-                    console.log(json);
-                });
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
-};
+                })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
+    };
