@@ -1,5 +1,4 @@
-const ScheduleUser = require('../models').ScheduleUser;
-const User = require('../models').User;
+const {ScheduleUser, User, Schedule} = require('../models');
 
 module.exports = {
     list(req, res) {
@@ -11,7 +10,8 @@ module.exports = {
                 offset: offset,
                 include: [
                     {
-                        model: ScheduleUser
+                        model: Schedule,
+                        required: false
                     },
                 ],
                 order: [

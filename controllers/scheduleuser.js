@@ -9,11 +9,21 @@ module.exports = {
                 limit: limit,
                 offset: offset,
                 include: [
-                    User, Schedule
+                    {
+                        model: User,
+                        required: false
+                    },
+                    {
+                        model: Schedule,
+                        required: false
+                    }
                 ],
                 order: [
                     ['createdAt', 'DESC'],
                 ],
+                where:{
+                    status:"waiting"
+                },
             })
             .then((scheduleusers) => res.status(200).send(scheduleusers))
             .catch((error) => {

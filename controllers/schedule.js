@@ -1,5 +1,5 @@
 const {Op} = require("sequelize");
-const ScheduleUser = require('../models').ScheduleUser;
+const {ScheduleUser, User} = require('../models');
 const Schedule = require('../models').Schedule;
 
 module.exports = {
@@ -12,8 +12,9 @@ module.exports = {
                 offset: offset,
                 include: [
                     {
-                        model: ScheduleUser
-                    },
+                        model: User,
+                        required: false,
+                    }
                 ],
                 order: [
                     ['createdAt', 'DESC'],
@@ -98,29 +99,30 @@ module.exports = {
     },
 
     cron() {
-        Schedule
+        return ScheduleUser
             .findAndCountAll({
-                where: {
-                    run_at: {
-                        [Op.lte]: new Date()
-                    }
-                },
                 include: [
                     {
-                        model: ScheduleUser
+                        model: User,
+                        required: false
                     },
+                    {
+                        model: Schedule,
+                        required: false
+                    }
                 ],
                 order: [
-                    ['createdAt', 'ASC'],
+                    ['createdAt', 'DESC'],
                 ],
+                where:{
+                    status:"waiting"
+                },
             })
-            .then((schedules) => {
-                schedules.rows.forEach(schedule => {
-                    console.log("schedule", schedule.ScheduleUsers);
-                });
+            .then((scheduleusers) => {
+                console.log(scheduleusers);
             })
             .catch((error) => {
-
+               console.log(error);
             });
     }
 };
