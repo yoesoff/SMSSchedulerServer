@@ -47,6 +47,10 @@ const cronService = require('./services').cron;
 schedule.scheduleJob('* * * * *', function(){
   console.log(`Cron running at ${(new Date())} `);
   cronService.runSchedules();
+
+  setTimeout(function() {
+    cronService.runCheckSMSStatus();
+  }, 5000);
 });
 
 module.exports = app;

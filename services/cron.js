@@ -4,6 +4,7 @@ const axios = require('axios');
 
 module.exports = {
     title: "Cron service running",
+    url: 'http://kr8tif.lawaapp.com:1338/api',
     runSchedules() {
         console.log(this.title);
         const params = {
@@ -29,6 +30,7 @@ module.exports = {
                 status: "waiting",
             },
         }
+
         return ScheduleUser
             .findAndCountAll(params)
             .then((scheduleusers) => {
@@ -60,7 +62,7 @@ module.exports = {
                             "message": d.message
                         };
 
-                        await axios.post('http://kr8tif.lawaapp.com:1338/api', json).then(function (response) {
+                        await axios.post(this.url, json).then(function (response) {
 
                             let arrData = [];
 
@@ -99,12 +101,63 @@ module.exports = {
                             console.log(error);
                         }).then(function () {
                         });
-                        console.log(json);
                     }
                 });
             })
             .catch((error) => {
                 console.log(error);
             });
+    },
+    runCheckSMSStatus() {
+        const params = {
+            include: [
+                {
+                    model: User,
+                    required: false
+                },
+                {
+                    model: Schedule,
+                    required: true,
+                    where: {
+                        run_at: {
+                            [Op.lte]: new Date()
+                        }
+                    }
+                }
+            ],
+            order: [
+                ['createdAt', 'DESC'],
+            ],
+            where: {
+                status: {
+                    [Op.notIn]: ["DELIVRD", "UNDELIV", "UNKNOWN"]
+                },
+            },
+        };
+
+        ScheduleUser.findAndCountAll(params)
+        .then((scheduleusers) => {
+            scheduleusers.rows.forEach((su) => {
+                if (su.message_id.length > 0) {
+                    axios.get(this.url + `?messageId=${su.message_id}` ).then(response => {
+                        console.log(`Update status for message ${su.message_id}`, response.data.status);
+                        su.status = response.data.status
+                        ScheduleUser.update(
+                            {status: response.data.status},
+                            {
+                                where: {
+                                    id: su.id
+                                }
+                            }
+                        )
+                    }).catch(function (error) {
+                        console.log(error);
+                    }).then(function () {
+                    });
+                } else {
+                    console.log("Message ID is not available yet!")
+                }
+            });
+        });
     }
 }
