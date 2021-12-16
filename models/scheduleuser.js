@@ -30,7 +30,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     schedule_id: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER,
-    status: DataTypes.STRING
+    status: DataTypes.STRING,
+    message_id: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'ScheduleUser',

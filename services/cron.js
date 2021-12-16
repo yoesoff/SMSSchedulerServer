@@ -3,7 +3,7 @@ const {ScheduleUser, Schedule, User} = require('../models');
 const axios = require('axios');
 
 module.exports = {
-    cron() {
+    runSchedules() {
         return ScheduleUser
             .findAndCountAll({
                 include: [
@@ -47,32 +47,57 @@ module.exports = {
                 });
 
                 data.forEach(async (d) => {
-                    const json = {
-                        "dnis": d.phone,
-                        "message": d.message
-                    };
-                    await axios.post('http://kr8tif.lawaapp.com:1338/api', json).then(function (response) {
-                        console.log("Axios response", response.data);
 
-                        // Update status waiting to pending
-                        ScheduleUser.update(
-                            {status: "pending"},
-                            {
-                                where: {
-                                    id: {
-                                        [Op.in]: d.ids
-                                    }
+                    if (!d.phone || d.phone.length <= 0) {
+                        console.log("Nothing todo, empty phone number");
+                    } else {
+                        let json = {
+                            "dnis": d.phone,
+                            "message_ids": [],
+                            "message": d.message
+                        };
+
+                        await axios.post('http://kr8tif.lawaapp.com:1338/api', json).then(function (response) {
+
+                            let arrData = [];
+
+                            // response is not consistence, for multiuple dnis [] and  {} for single dnis
+                            if (Array.isArray(response.data)) {
+                                arrData = response.data;
+                            } else {
+                                // object is empty?
+                                if (Object.keys(response.data).length === 0 ) {
+                                    console.log("hmhm... somehow response is empty.");
+                                } else {
+                                    arrData.push(response.data);
                                 }
                             }
-                        ).then((result) => {
-                            console.log("ScheduleUser updated to pending", result);
+
+                            arrData.forEach((dt, i) => {
+                                json.message_ids = json.message_ids.concat([dt.message_id])
+
+                                ScheduleUser.update(
+                                    {status: "pending", message_id: dt.message_id},
+                                    {
+                                        where: {
+                                            id: d.ids[i]
+                                        }
+                                    }
+                                ).then((result) => {
+                                    if (result > 0) {
+                                        console.info(`ScheduleUser ${d.ids[i]} updated; message_id: ${dt.message_id}, status: pending`);
+                                    } else {
+                                        console.info("Nothing to update")
+                                    }
+                                });
+                            });
+
+                        }).catch(function (error) {
+                            console.log(error);
+                        }).then(function () {
                         });
-                    }).
-                    catch(function (error) {
-                        console.log(error);
-                    }).then(function () {
-                    });
-                    console.log(json);
+                        console.log(json);
+                    }
                 });
             })
             .catch((error) => {

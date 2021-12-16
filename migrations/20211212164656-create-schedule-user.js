@@ -21,6 +21,11 @@ module.exports = {
         defaultValue: null,
         type: Sequelize.STRING
       },
+      message_id: {
+        allowNull: true,
+        defaultValue: null,
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

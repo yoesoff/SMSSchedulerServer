@@ -46,7 +46,7 @@ app.use(function(err, req, res, next) {
 const cronService = require('./services').cron;
 schedule.scheduleJob('* * * * *', function(){
   console.log(`Cron running at ${(new Date())} `);
-  cronService.cron();
+  cronService.runSchedules();
 });
 
 module.exports = app;
