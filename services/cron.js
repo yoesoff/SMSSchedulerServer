@@ -3,31 +3,34 @@ const {ScheduleUser, Schedule, User} = require('../models');
 const axios = require('axios');
 
 module.exports = {
+    title: "Cron service running",
     runSchedules() {
-        return ScheduleUser
-            .findAndCountAll({
-                include: [
-                    {
-                        model: User,
-                        required: false
-                    },
-                    {
-                        model: Schedule,
-                        required: true,
-                        where: {
-                            run_at: {
-                                [Op.lte]: new Date()
-                            }
+        console.log(this.title);
+        const params = {
+            include: [
+                {
+                    model: User,
+                    required: false
+                },
+                {
+                    model: Schedule,
+                    required: true,
+                    where: {
+                        run_at: {
+                            [Op.lte]: new Date()
                         }
                     }
-                ],
-                order: [
-                    ['createdAt', 'DESC'],
-                ],
-                where: {
-                    status: "waiting",
-                },
-            })
+                }
+            ],
+            order: [
+                ['createdAt', 'DESC'],
+            ],
+            where: {
+                status: "waiting",
+            },
+        }
+        return ScheduleUser
+            .findAndCountAll(params)
             .then((scheduleusers) => {
                 let data = [];
                 scheduleusers.rows.forEach((su) => {
@@ -87,7 +90,7 @@ module.exports = {
                                     if (result > 0) {
                                         console.info(`ScheduleUser ${d.ids[i]} updated; message_id: ${dt.message_id}, status: pending`);
                                     } else {
-                                        console.info("Nothing to update")
+                                        console.info("No update happened!")
                                     }
                                 });
                             });
