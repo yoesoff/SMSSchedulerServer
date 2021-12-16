@@ -43,10 +43,10 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-const scheduleController = require('./controllers').schedule;
-const job = schedule.scheduleJob('* * * * *', function(){
+const cronService = require('./services').cron;
+schedule.scheduleJob('* * * * *', function(){
   console.log(`Cron running at ${(new Date())} `);
-  scheduleController.cron();
+  cronService.cron();
 });
 
 module.exports = app;
