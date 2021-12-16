@@ -26,11 +26,6 @@ Cron job runs inside the application, for the configuration can be seen at app.j
 - Check the status of sent SMS.
 - Update the status of the SMS sent by cron
 
-
-This text you see here is *actually- written in Markdown! To get a feel
-for Markdown's syntax, type some text into the left window and
-watch the results in the right.
-
 ## Tech
 This project uses a number of open source projects to work properly:
 
